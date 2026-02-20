@@ -58,6 +58,22 @@ class GarminPickleballScoreView extends WatchUi.DataField {
         var bgColor = getBackgroundColor();
         var fgColor = (bgColor == Graphics.COLOR_BLACK) ? Graphics.COLOR_WHITE : Graphics.COLOR_BLACK;
 
+//        System.print(OBSCURE_LEFT | OBSCURE_TOP | OBSCURE_RIGHT | OBSCURE_BOTTOM);
+        // Check if data field is in a quadrant (not fullscreen)
+        if (getObscurityFlags() != (OBSCURE_LEFT | OBSCURE_TOP | OBSCURE_RIGHT | OBSCURE_BOTTOM)) {
+            // In a quadrant layout - display message
+            dc.setColor(fgColor, bgColor);
+            dc.clear();
+            dc.drawText(
+                width / 2,
+                height / 2,
+                Graphics.FONT_XTINY,
+                "FULLSCREEN\nREQUIRED",
+                Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER
+            );
+            return;
+        }
+
         // Pre-calculate common positions
         var centerX = width / 2;
         var centerY = height / 2;
