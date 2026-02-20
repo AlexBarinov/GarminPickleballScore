@@ -1,0 +1,9 @@
+<fitContributions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://developer.garmin.com/downloads/connect-iq/resources.xsd">
+    <fitField id="0"
+              displayInChart="false"
+              displayInActivityLaps="true"
+              displayInActivitySummary="false"
+              sortOrder="0"
+              dataLabel="@Strings.ScoreLabel"
+              unitLabel="@Strings.ScoreUnit" />
+</fitContributions>
