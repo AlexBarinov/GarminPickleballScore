@@ -3,7 +3,7 @@
               displayInChart="false"
               displayInActivityLaps="true"
               displayInActivitySummary="false"
+              sortOrder="0"
               dataLabel="@Strings.ScoreLabel"
-              unitLabel=""
-              nativeNum="pickleball_score" />
+              unitLabel="@Strings.ScoreUnit" />
 </fitContributions>
