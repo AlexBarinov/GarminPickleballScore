@@ -137,7 +137,7 @@ class GarminPickleballScoreView extends WatchUi.DataField {
         }
     }
 
-    function onTap(clickEvent as WatchUi.ClickEvent) {
+    function onTap(clickEvent as WatchUi.ClickEvent) as Boolean {
         var coords = clickEvent.getCoordinates();
         var screenHeight = System.getDeviceSettings().screenHeight;
 
@@ -182,5 +182,7 @@ class GarminPickleballScoreView extends WatchUi.DataField {
 
         // Request UI update
         WatchUi.requestUpdate();
+
+        return true;
     }
 }
