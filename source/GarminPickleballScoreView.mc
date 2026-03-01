@@ -42,6 +42,10 @@ class GarminPickleballScoreView extends WatchUi.DataField {
 
     hidden var scoreFont as Graphics.FontDefinition;
     hidden var labelFont as Graphics.FontDefinition;
+    hidden var textJustify as Number;
+    hidden var screenHeight as Number;
+    hidden var opponentScoreText as String;
+    hidden var playerScoreText as String;
 
 
     function initialize() {
@@ -62,6 +66,10 @@ class GarminPickleballScoreView extends WatchUi.DataField {
 
         scoreFont = Graphics.FONT_SYSTEM_NUMBER_THAI_HOT;
         labelFont = Graphics.FONT_SYSTEM_XTINY;
+        textJustify = Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER;
+        screenHeight = System.getDeviceSettings().screenHeight;
+        opponentScoreText = "0";
+        playerScoreText = "0";
 
         // Create FIT field for lap score (format: "NN-NN (X)")
         scoreField = createField(
@@ -70,7 +78,9 @@ class GarminPickleballScoreView extends WatchUi.DataField {
             FitContributor.DATA_TYPE_STRING,
             {:mesgType=>FitContributor.MESG_TYPE_LAP, :units=>"", :count=>15}
         );
-        scoreField.setData("");
+        if (scoreField != null) {
+            scoreField.setData("");
+        }
     }
 
     // Update the FIT field with the current score
@@ -98,6 +108,8 @@ class GarminPickleballScoreView extends WatchUi.DataField {
         // Reset scores and serving side for new game
         opponentScore = 0;
         playerScore = 0;
+        opponentScoreText = "0";
+        playerScoreText = "0";
         servingSide = SERVING_NONE;
         serverNumber = SERVER_TWO; // Start with server 2 (0-0-2 rule)
         courtSide = COURT_RIGHT;
@@ -137,8 +149,10 @@ class GarminPickleballScoreView extends WatchUi.DataField {
     private function handleScore(tappedSide as Number) as Void {
         if (tappedSide == SERVING_OPPONENT) {
             opponentScore++;
+            opponentScoreText = opponentScore.format("%d");
         } else {
             playerScore++;
+            playerScoreText = playerScore.format("%d");
         }
         // Switch court sides after scoring (same for doubles and singles)
         courtSide = (courtSide == COURT_RIGHT) ? COURT_LEFT : COURT_RIGHT;
@@ -192,7 +206,7 @@ class GarminPickleballScoreView extends WatchUi.DataField {
                 height / 2,
                 labelFont,
                 "FULLSCREEN\nREQUIRED",
-                Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER
+                textJustify
             );
             return;
         }
@@ -205,8 +219,6 @@ class GarminPickleballScoreView extends WatchUi.DataField {
         // Use cached layout values
         var centerX = width / 2;
         var centerY = height / 2;
-
-        var textJustify = Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER;
 
         // Clear the screen with background color
         dc.setColor(fgColor, bgColor);
@@ -222,11 +234,9 @@ class GarminPickleballScoreView extends WatchUi.DataField {
         dc.drawText(centerX, upperLabelY, labelFont, "OPP", textJustify);
 
         // Draw opponent score in upper half
-        var opponentScoreText = opponentScore.format("%d");
         dc.drawText(centerX, upperScoreY, scoreFont, opponentScoreText, textJustify);
 
         // Draw player score in lower half
-        var playerScoreText = playerScore.format("%d");
         dc.drawText(centerX, lowerScoreY, scoreFont, playerScoreText, textJustify);
 
         // Draw "ME" label below player score
@@ -264,7 +274,7 @@ class GarminPickleballScoreView extends WatchUi.DataField {
                     scoreY,
                     labelFont,
                     serverNumber.format("%d"),
-                    Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER
+                    textJustify
                 );
             }
         }
@@ -272,7 +282,6 @@ class GarminPickleballScoreView extends WatchUi.DataField {
 
     function onTap(clickEvent as WatchUi.ClickEvent) as Boolean {
         var coords = clickEvent.getCoordinates();
-        var screenHeight = System.getDeviceSettings().screenHeight;
 
         // Determine which half was tapped
         var tappedSide = (coords[1] < screenHeight / 2) ? SERVING_OPPONENT : SERVING_PLAYER;
