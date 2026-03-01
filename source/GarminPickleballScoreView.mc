@@ -7,13 +7,31 @@ import Toybox.System;
 import Toybox.WatchUi;
 
 class GarminPickleballScoreView extends WatchUi.DataField {
+    // Constants for serving indicator
+    const INDICATOR_RADIUS = 24;
+    const INDICATOR_PADDING = 20;
+
+    // Constants for game state
+    const SERVING_NONE = 0;
+    const SERVING_OPPONENT = 1;
+    const SERVING_PLAYER = 2;
+
+    const COURT_LEFT = 0;
+    const COURT_RIGHT = 1;
+
+    const GAME_DOUBLES = 0;
+    const GAME_SINGLES = 1;
+
+    const SERVER_ONE = 1;
+    const SERVER_TWO = 2;
+
     hidden var opponentScore as Number;
     hidden var playerScore as Number;
     hidden var scoreField as FitContributor.Field?;
-    hidden var servingSide as Number; // 0 = none, 1 = opponent, 2 = player
-    hidden var serverNumber as Number; // 1 or 2 (for doubles)
-    hidden var gameType as Number; // 0 = Doubles, 1 = Singles (cached for current game)
-    hidden var courtSide as Number; // 0 = left, 1 = right (actual court position for doubles)
+    hidden var servingSide as Number; // SERVING_NONE, SERVING_OPPONENT, or SERVING_PLAYER
+    hidden var serverNumber as Number; // SERVER_ONE or SERVER_TWO
+    hidden var gameType as Number; // GAME_DOUBLES or GAME_SINGLES (cached for current game)
+    hidden var courtSide as Number; // COURT_LEFT or COURT_RIGHT
 
     // Cached layout calculations
     hidden var cachedHeight as Number;
@@ -30,9 +48,9 @@ class GarminPickleballScoreView extends WatchUi.DataField {
         DataField.initialize();
         opponentScore = 0;
         playerScore = 0;
-        servingSide = 0; // No serving side at start
-        serverNumber = 2; // Start with server 2 (0-0-2 rule)
-        courtSide = 1; // Start on right side
+        servingSide = SERVING_NONE;
+        serverNumber = SERVER_TWO; // Start with server 2 (0-0-2 rule)
+        courtSide = COURT_RIGHT;
         gameType = Application.Properties.getValue("GameType"); // Cache game type
 
         // Initialize cached layout values
@@ -45,19 +63,19 @@ class GarminPickleballScoreView extends WatchUi.DataField {
         scoreFont = Graphics.FONT_NUMBER_THAI_HOT;
         labelFont = Graphics.FONT_XTINY;
 
-        // Create FIT field for lap score (allocate 10 chars for "99-99")
+        // Create FIT field for lap score (format: "NN-NN (X)")
         scoreField = createField(
             "pickleball_score",
             0,
             FitContributor.DATA_TYPE_STRING,
-            {:mesgType=>FitContributor.MESG_TYPE_LAP, :units=>"", :count=>10}
+            {:mesgType=>FitContributor.MESG_TYPE_LAP, :units=>"", :count=>15}
         );
         scoreField.setData("");
     }
 
     // Update the FIT field with the current score
     private function updateScoreField() as Void {
-        if(scoreField == null) {
+        if (scoreField == null) {
             return;
         }
 
@@ -65,8 +83,8 @@ class GarminPickleballScoreView extends WatchUi.DataField {
             return;
         }
 
-        // Use cached game type (0 = Doubles, 1 = Singles)
-        var gameTypeLabel = (gameType == 0) ? "D" : "S";
+        // Use cached game type
+        var gameTypeLabel = (gameType == GAME_DOUBLES) ? "D" : "S";
 
         var scoreText = playerScore.format("%d") + "-" + opponentScore.format("%d") + " (" + gameTypeLabel + ")";
         scoreField.setData(scoreText);
@@ -80,9 +98,9 @@ class GarminPickleballScoreView extends WatchUi.DataField {
         // Reset scores and serving side for new game
         opponentScore = 0;
         playerScore = 0;
-        servingSide = 0;
-        serverNumber = 2; // Start with server 2 (0-0-2 rule)
-        courtSide = 1; // Start on right side
+        servingSide = SERVING_NONE;
+        serverNumber = SERVER_TWO; // Start with server 2 (0-0-2 rule)
+        courtSide = COURT_RIGHT;
         gameType = Application.Properties.getValue("GameType"); // Reload game type for next game
 
         // Request UI update to show reset scores
@@ -109,28 +127,21 @@ class GarminPickleballScoreView extends WatchUi.DataField {
     }
 
     // Handle first serve establishment
-    private function handleFirstServe(tappedSide as Number, isDoubles as Boolean) as Void {
+    private function handleFirstServe(tappedSide as Number) as Void {
         servingSide = tappedSide;
-        serverNumber = isDoubles ? 2 : 1;
-
-        // Set court side: doubles always start right, singles based on score
-        if (isDoubles) {
-            courtSide = 1; // Always start on right side
-        } else {
-            var servingScore = (tappedSide == 1) ? opponentScore : playerScore;
-            courtSide = (servingScore % 2 == 0) ? 1 : 0; // Even = right, odd = left
-        }
+        serverNumber = SERVER_TWO;
+        courtSide = COURT_RIGHT; // Always start on right side
     }
 
     // Handle scoring a point
     private function handleScore(tappedSide as Number) as Void {
-        if (tappedSide == 1) {
+        if (tappedSide == SERVING_OPPONENT) {
             opponentScore++;
         } else {
             playerScore++;
         }
         // Switch court sides after scoring (same for doubles and singles)
-        courtSide = (courtSide == 1) ? 0 : 1;
+        courtSide = (courtSide == COURT_RIGHT) ? COURT_LEFT : COURT_RIGHT;
     }
 
     // Handle rally lost by serving side
@@ -144,26 +155,23 @@ class GarminPickleballScoreView extends WatchUi.DataField {
 
     // Handle rally lost in doubles
     private function handleDoublesRallyLost(tappedSide as Number) as Void {
-        if (serverNumber == 1) {
+        if (serverNumber == SERVER_ONE) {
             // Switch to server 2, same team keeps serve
-            serverNumber = 2;
-            courtSide = (courtSide == 1) ? 0 : 1; // Switch sides
+            serverNumber = SERVER_TWO;
+            courtSide = (courtSide == COURT_RIGHT) ? COURT_LEFT : COURT_RIGHT; // Switch sides
         } else {
             // Server 2 lost - side-out to other team
             servingSide = tappedSide;
-            serverNumber = 1;
-            courtSide = 1; // New team always starts on right side
+            serverNumber = SERVER_ONE;
+            courtSide = COURT_RIGHT; // New team always starts on right side
         }
     }
 
     // Handle rally lost in singles
     private function handleSinglesRallyLost(tappedSide as Number) as Void {
-        // Side-out to other team
         servingSide = tappedSide;
-        serverNumber = 1;
-        // Set court side based on new server's score
-        var servingScore = (tappedSide == 1) ? opponentScore : playerScore;
-        courtSide = (servingScore % 2 == 0) ? 1 : 0; // Even = right, odd = left
+        var servingScore = (tappedSide == SERVING_OPPONENT) ? opponentScore : playerScore;
+        courtSide = (servingScore % 2 == 0) ? COURT_RIGHT : COURT_LEFT; // Even = right, odd = left
     }
 
     // Display the value you computed here. This will be called
@@ -225,31 +233,31 @@ class GarminPickleballScoreView extends WatchUi.DataField {
         dc.drawText(centerX, lowerLabelY, labelFont, "ME", textJustify);
 
         // Draw serving indicator (yellow circle showing court side to serve from)
-        if (servingSide != 0) {
+        if (servingSide != SERVING_NONE) {
             dc.setColor(Graphics.COLOR_YELLOW, Graphics.COLOR_TRANSPARENT);
-            var scoreText = (servingSide == 1) ? opponentScoreText : playerScoreText;
-            var scoreY = (servingSide == 1) ? upperScoreY : lowerScoreY;
-            var textWidth = dc.getTextWidthInPixels(scoreText, Graphics.FONT_NUMBER_HOT);
+            var scoreText = (servingSide == SERVING_OPPONENT) ? opponentScoreText : playerScoreText;
+            var scoreY = (servingSide == SERVING_OPPONENT) ? upperScoreY : lowerScoreY;
+            var textWidth = dc.getTextWidthInPixels(scoreText, scoreFont);
 
             // Determine court side from tracked courtSide (single source of truth)
-            var isRightSide = (courtSide == 1);
+            var isRightSide = (courtSide == COURT_RIGHT);
 
-            // For opponent (servingSide == 1), flip the side because we view from opposite angle
-            if (servingSide == 1) {
+            // For opponent (servingSide == SERVING_OPPONENT), flip the side because we view from opposite angle
+            if (servingSide == SERVING_OPPONENT) {
                 isRightSide = !isRightSide;
             }
 
             var indicatorX;
             if (isRightSide) {
-                indicatorX = centerX + (textWidth / 2) + 24 + 20; // radius=24, padding=20
+                indicatorX = centerX + (textWidth / 2) + INDICATOR_RADIUS + INDICATOR_PADDING;
             } else {
-                indicatorX = centerX - (textWidth / 2) - 24 - 20;
+                indicatorX = centerX - (textWidth / 2) - INDICATOR_RADIUS - INDICATOR_PADDING;
             }
-            
-            dc.fillCircle(indicatorX, scoreY, 24);
 
-            // Draw server number for doubles (use cached game type)
-            if (gameType == 0) { // Doubles
+            dc.fillCircle(indicatorX, scoreY, INDICATOR_RADIUS);
+
+            // Draw server number for doubles
+            if (gameType == GAME_DOUBLES) {
                 dc.setColor(Graphics.COLOR_BLACK, Graphics.COLOR_TRANSPARENT);
                 dc.drawText(
                     indicatorX,
@@ -266,15 +274,15 @@ class GarminPickleballScoreView extends WatchUi.DataField {
         var coords = clickEvent.getCoordinates();
         var screenHeight = System.getDeviceSettings().screenHeight;
 
-        // Determine which half was tapped (1 = opponent/upper, 2 = player/lower)
-        var tappedSide = (coords[1] < screenHeight / 2) ? 1 : 2;
+        // Determine which half was tapped
+        var tappedSide = (coords[1] < screenHeight / 2) ? SERVING_OPPONENT : SERVING_PLAYER;
 
-        // Use cached game type (0 = Doubles, 1 = Singles)
-        var isDoubles = (gameType == 0);
+        // Use cached game type
+        var isDoubles = (gameType == GAME_DOUBLES);
 
-        if (servingSide == 0) {
+        if (servingSide == SERVING_NONE) {
             // First tap - establish serve
-            handleFirstServe(tappedSide, isDoubles);
+            handleFirstServe(tappedSide);
         } else if (servingSide == tappedSide) {
             // Tapped the serving side - score a point
             handleScore(tappedSide);
