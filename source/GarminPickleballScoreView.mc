@@ -60,8 +60,8 @@ class GarminPickleballScoreView extends WatchUi.DataField {
         lowerScoreY = 0;
         lowerLabelY = 0;
 
-        scoreFont = Graphics.FONT_NUMBER_THAI_HOT;
-        labelFont = Graphics.FONT_XTINY;
+        scoreFont = Graphics.FONT_SYSTEM_NUMBER_THAI_HOT;
+        labelFont = Graphics.FONT_SYSTEM_XTINY;
 
         // Create FIT field for lap score (format: "NN-NN (X)")
         scoreField = createField(
@@ -190,7 +190,7 @@ class GarminPickleballScoreView extends WatchUi.DataField {
             dc.drawText(
                 width / 2,
                 height / 2,
-                Graphics.FONT_XTINY,
+                labelFont,
                 "FULLSCREEN\nREQUIRED",
                 Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER
             );
@@ -262,7 +262,7 @@ class GarminPickleballScoreView extends WatchUi.DataField {
                 dc.drawText(
                     indicatorX,
                     scoreY,
-                    Graphics.FONT_SYSTEM_XTINY,
+                    labelFont,
                     serverNumber.format("%d"),
                     Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER
                 );

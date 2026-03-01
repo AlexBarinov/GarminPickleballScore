@@ -5,7 +5,7 @@
         Use "Monkey C: Edit Application" from the Visual Studio Code command palette
         to update the application attributes.
     -->
-    <iq:application id="7ba643d4-05ee-4ef3-874d-bb1ece5be1a9" type="datafield" name="@Strings.AppName" entry="GarminPickleballScoreApp" launcherIcon="@Drawables.LauncherIcon" minApiLevel="1.3.0">
+    <iq:application id="cf98e3dd-1fb6-468b-93ec-163f2276d493" type="datafield" name="@Strings.AppName" entry="GarminPickleballScoreApp" launcherIcon="@Drawables.LauncherIcon" minApiLevel="2.3.0">
         <!--
             Use the following from the Visual Studio Code comand palette to edit
             the build targets:
