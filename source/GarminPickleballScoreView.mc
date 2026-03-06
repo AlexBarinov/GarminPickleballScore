@@ -43,8 +43,8 @@ class GarminPickleballScoreView extends WatchUi.DataField {
     hidden var scoreFont as Graphics.FontDefinition;
     hidden var labelFont as Graphics.FontDefinition;
     hidden var indicatorFont as Graphics.FontDefinition;
+
     hidden var textJustify as Number;
-    hidden var screenHeight as Number;
     hidden var opponentScoreText as String;
     hidden var playerScoreText as String;
 
@@ -68,8 +68,8 @@ class GarminPickleballScoreView extends WatchUi.DataField {
         scoreFont = Graphics.FONT_SYSTEM_NUMBER_THAI_HOT;
         labelFont = Graphics.FONT_SYSTEM_XTINY;
         indicatorFont = Graphics.FONT_SYSTEM_TINY;
+
         textJustify = Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER;
-        screenHeight = System.getDeviceSettings().screenHeight;
         opponentScoreText = "0";
         playerScoreText = "0";
 
@@ -286,7 +286,7 @@ class GarminPickleballScoreView extends WatchUi.DataField {
         var coords = clickEvent.getCoordinates();
 
         // Determine which half was tapped
-        var tappedSide = (coords[1] < screenHeight / 2) ? SERVING_OPPONENT : SERVING_PLAYER;
+        var tappedSide = (coords[1] < cachedHeight / 2) ? SERVING_OPPONENT : SERVING_PLAYER;
 
         // Use cached game type
         var isDoubles = (gameType == GAME_DOUBLES);
