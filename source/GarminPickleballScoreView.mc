@@ -96,7 +96,7 @@ class GarminPickleballScoreView extends WatchUi.DataField {
         // Use cached game type
         var gameTypeLabel = (gameType == GAME_DOUBLES) ? "D" : "S";
 
-        var scoreText = playerScore.format("%d") + "-" + opponentScore.format("%d") + " (" + gameTypeLabel + ")";
+        var scoreText = + "[" + gameTypeLabel + "] " + playerScore.format("%d") + "-" + opponentScore.format("%d");
         scoreField.setData(scoreText);
     }
 

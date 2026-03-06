@@ -1,7 +1,7 @@
 <strings xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://developer.garmin.com/downloads/connect-iq/resources.xsd">
     <string id="AppName">GarminPickleballScore</string>
-    <string id="ScoreLabel">Pickleball Score</string>
-    <string id="ScoreUnit"></string>
+    <string id="ScoreLabel">Score</string>
+    <string id="ScoreUnit">pts</string>
     <string id="GameTypeTitle">Game Type</string>
     <string id="Singles">Singles</string>
     <string id="Doubles">Doubles</string>
