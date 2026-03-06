@@ -35,5 +35,8 @@
             command palette to edit the included barrels.
         -->
         <iq:barrels/>
+        <iq:activityFilter>
+            <iq:activity sport="Toybox.Activity.SPORT_RACKET" subsport="Toybox.Activity.SUB_SPORT_PICKLEBALL"/>
+        </iq:activityFilter>
     </iq:application>
 </iq:manifest>
