@@ -51,6 +51,11 @@ There's no easy way for me to figure out what watch can do that without testing 
 
 ## Changelog
 
+### Version 0.3.0
+
+- Fixed: scores now display correctly as separate fields in Garmin Connect activity laps
+- Added: score cap at 99 points
+
 ### Version 0.2.0
 
 - Fixed: potential fix to display laps in Garmin Connect
