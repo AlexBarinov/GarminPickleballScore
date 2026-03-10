@@ -24,6 +24,7 @@ class GarminPickleballScoreView extends WatchUi.DataField {
 
     const SERVER_ONE = 1;
     const SERVER_TWO = 2;
+    const MAX_SCORE = 99;
 
     hidden var opponentScore as Number;
     hidden var playerScore as Number;
@@ -147,11 +148,15 @@ class GarminPickleballScoreView extends WatchUi.DataField {
     // Handle scoring a point
     private function handleScore(tappedSide as Number) as Void {
         if (tappedSide == SERVING_OPPONENT) {
-            opponentScore++;
-            opponentScoreText = opponentScore.format("%d");
+            if (opponentScore < MAX_SCORE) {
+                opponentScore++;
+                opponentScoreText = opponentScore.format("%d");
+            }
         } else {
-            playerScore++;
-            playerScoreText = playerScore.format("%d");
+            if (playerScore < MAX_SCORE) {
+                playerScore++;
+                playerScoreText = playerScore.format("%d");
+            }
         }
         // Switch court sides after scoring (same for doubles and singles)
         courtSide = (courtSide == COURT_RIGHT) ? COURT_LEFT : COURT_RIGHT;
