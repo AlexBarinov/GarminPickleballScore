@@ -27,7 +27,8 @@ class GarminPickleballScoreView extends WatchUi.DataField {
 
     hidden var opponentScore as Number;
     hidden var playerScore as Number;
-    hidden var scoreField as FitContributor.Field?;
+    hidden var myScoreField as FitContributor.Field?;
+    hidden var oppScoreField as FitContributor.Field?;
     hidden var servingSide as Number; // SERVING_NONE, SERVING_OPPONENT, or SERVING_PLAYER
     hidden var serverNumber as Number; // SERVER_ONE or SERVER_TWO
     hidden var gameType as Number; // GAME_DOUBLES or GAME_SINGLES (cached for current game)
@@ -73,40 +74,36 @@ class GarminPickleballScoreView extends WatchUi.DataField {
         opponentScoreText = "0";
         playerScoreText = "0";
 
-        // Create FIT field for lap score (format: "NN-NN (X)")
-        scoreField = createField(
-            "pickleball_score",
+        // Create FIT fields for lap scores
+        myScoreField = createField(
+            "my_score",
             0,
-            FitContributor.DATA_TYPE_STRING,
-            {:mesgType=>FitContributor.MESG_TYPE_LAP, :units=>"", :count=>15}
+            FitContributor.DATA_TYPE_UINT16,
+            {:mesgType=>FitContributor.MESG_TYPE_LAP, :units=>"pts"}
         );
-        if (scoreField != null) {
-            scoreField.setData("");
-        }
+        oppScoreField = createField(
+            "opp_score",
+            1,
+            FitContributor.DATA_TYPE_UINT16,
+            {:mesgType=>FitContributor.MESG_TYPE_LAP, :units=>"pts"}
+        );
     }
 
-    // Update the FIT field with the current score
-    private function updateScoreField() as Void {
-        if (scoreField == null) {
+    // Update the FIT fields with the current score
+    private function updateScoreFit() as Void {
+        if (playerScore == 0 && opponentScore == 0) {
             return;
         }
-
-        if (opponentScore == 0 && playerScore == 0) {
-            return;
+        if (myScoreField != null) {
+            myScoreField.setData(playerScore);
         }
-
-        // Use cached game type
-        var gameTypeLabel = (gameType == GAME_DOUBLES) ? "D" : "S";
-
-        var scoreText = + "[" + gameTypeLabel + "] " + playerScore.format("%d") + "-" + opponentScore.format("%d");
-        scoreField.setData(scoreText);
+        if (oppScoreField != null) {
+            oppScoreField.setData(opponentScore);
+        }
     }
 
     // Called when a lap is added to the current activity
     function onTimerLap() as Void {
-        // Save current score to FIT field before resetting
-        updateScoreField();
-
         // Reset scores and serving side for new game
         opponentScore = 0;
         playerScore = 0;
@@ -303,7 +300,7 @@ class GarminPickleballScoreView extends WatchUi.DataField {
         }
 
         // Update FIT field with current score
-        updateScoreField();
+        updateScoreFit();
 
         // Request UI update
         WatchUi.requestUpdate();
