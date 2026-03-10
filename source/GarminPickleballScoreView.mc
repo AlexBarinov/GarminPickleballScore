@@ -74,13 +74,15 @@ class GarminPickleballScoreView extends WatchUi.DataField {
         opponentScoreText = "0";
         playerScoreText = "0";
 
-        // Create FIT field for lap score
-        scoreField = createField(
-            "pickleball_score",
-            0,
-            FitContributor.DATA_TYPE_STRING,
-            {:mesgType=>FitContributor.MESG_TYPE_LAP, :units=>"", :count=>15}
-        );
+        // Create FIT field for lap score if enabled
+        if (Application.Properties.getValue("SaveToFit")) {
+            scoreField = createField(
+                "pickleball_score",
+                0,
+                FitContributor.DATA_TYPE_STRING,
+                {:mesgType=>FitContributor.MESG_TYPE_LAP, :units=>"", :count=>7}
+            );
+        }
     }
 
     // Update the FIT field with the current score
@@ -89,10 +91,10 @@ class GarminPickleballScoreView extends WatchUi.DataField {
             return;
         }
         if (playerScore == 0 && opponentScore == 0) {
-            return;
+            scoreField.setData("---");
+        } else {
+            scoreField.setData(playerScore.format("%d") + "-" + opponentScore.format("%d"));
         }
-        var gameTypeLabel = (gameType == GAME_DOUBLES) ? "D" : "S";
-        scoreField.setData("[" + gameTypeLabel + "] " + playerScore.format("%d") + "-" + opponentScore.format("%d"));
     }
 
     // Called when a lap is added to the current activity
@@ -106,6 +108,8 @@ class GarminPickleballScoreView extends WatchUi.DataField {
         serverNumber = SERVER_TWO; // Start with server 2 (0-0-2 rule)
         courtSide = COURT_RIGHT;
         gameType = Application.Properties.getValue("GameType"); // Reload game type for next game
+
+        updateScoreFit();
 
         // Request UI update to show reset scores
         WatchUi.requestUpdate();

@@ -51,6 +51,10 @@ There's no easy way for me to figure out what watch can do that without testing 
 
 ## Changelog
 
+### Version 0.4.0
+
+- Added: setting to toggle FIT score recording (default off)
+
 ### Version 0.3.0
 
 - Fixed: scores now display correctly as separate fields in Garmin Connect activity laps

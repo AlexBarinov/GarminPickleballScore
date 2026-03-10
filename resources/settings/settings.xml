@@ -5,4 +5,7 @@
             <listEntry value="1">@Strings.Singles</listEntry>
         </settingConfig>
     </setting>
+    <setting propertyKey="@Properties.SaveToFit" title="@Strings.SaveToFitTitle">
+        <settingConfig type="boolean" />
+    </setting>
 </settings>

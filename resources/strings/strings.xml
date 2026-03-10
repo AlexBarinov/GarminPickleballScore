@@ -3,6 +3,7 @@
     <string id="ScoreLabel">Score</string>
     <string id="ScoreUnit">pts</string>
     <string id="GameTypeTitle">Game Type</string>
+    <string id="SaveToFitTitle">Save Score to FIT</string>
     <string id="Singles">Singles</string>
     <string id="Doubles">Doubles</string>
 </strings>
