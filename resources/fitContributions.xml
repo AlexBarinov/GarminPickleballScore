@@ -4,13 +4,6 @@
               displayInActivityLaps="true"
               displayInActivitySummary="false"
               sortOrder="0"
-              dataLabel="@Strings.MyScoreLabel"
-              unitLabel="@Strings.ScoreUnit" />
-    <fitField id="1"
-              displayInChart="false"
-              displayInActivityLaps="true"
-              displayInActivitySummary="false"
-              sortOrder="1"
-              dataLabel="@Strings.OppScoreLabel"
+              dataLabel="@Strings.ScoreLabel"
               unitLabel="@Strings.ScoreUnit" />
 </fitContributions>
