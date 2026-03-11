@@ -281,6 +281,12 @@ class GarminPickleballScoreView extends WatchUi.DataField {
     }
 
     function onTap(clickEvent as WatchUi.ClickEvent) as Boolean {
+        var info = Activity.getActivityInfo();
+
+        if (info == null || info.timerState != Activity.TIMER_STATE_ON) {
+            return false;
+        }
+
         var coords = clickEvent.getCoordinates();
 
         // Determine which half was tapped
