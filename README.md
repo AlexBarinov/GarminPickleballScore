@@ -42,6 +42,7 @@ There's no easy way for me to figure out what watch can do that without testing 
 ### Works on
 
 - ✅ fenix 8 Pro
+- ✅ Enduro 3
 
 ### Does not work on
 
@@ -50,6 +51,10 @@ There's no easy way for me to figure out what watch can do that without testing 
 ---
 
 ## Changelog
+
+### Version 0.5.0
+
+- Added: support for Enduro 3 (thank you to beta tester Sergei Gor)
 
 ### Version 0.4.0
 
